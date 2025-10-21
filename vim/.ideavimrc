@@ -1,0 +1,58 @@
+set number
+                                         set relativenumber
+                                         set hidden
+                                         set noerrorbells
+                                         set tabstop=4 shiftwidth=4 expandtab
+                                         set smartindent
+                                         set scrolloff=8
+                                         set nowrap
+                                         set ignorecase
+                                         set smartcase
+                                         set incsearch
+                                         set termguicolors
+                                         set ruler
+                                         set hlsearch
+                                         set timeoutlen=5000
+                                         set matchpairs+=<:>
+
+                                         let mapleader = " "
+
+                                         nnoremap n nzz
+                                         nnoremap N Nzz
+                                         nnoremap j jzz
+                                         nnoremap k kzz
+                                         nnoremap <C-d> <C-d>zz:Q
+
+                                         nnoremap <C-u> <C-u>zz
+
+                                         nnoremap <leader>h :nohlsearch<CR>
+
+                                         vnoremap J :m '>+1<CR>gv=gv
+                                         vnoremap K :m '<-2<CR>gv=gv
+                                         nnoremap J mzJ`z
+
+                                         xnoremap <leader>p "_dP
+                                         nnoremap <leader>y "+y
+                                         vnoremap <leader>y "+y
+                                         nnoremap <leader>Y "+Y
+                                         nnoremap <leader>d "_d
+                                         vnoremap <leader>d "_d
+
+                                         nnoremap <leader>w :w<CR>
+                                         nnoremap <leader>q :q<CR>
+                                         nnoremap <leader>x :x<CR>
+                                         nnoremap <leader><leader> :source ~/.ideavimrc<CR>
+
+                                         nnoremap <C-h> <C-w>h
+                                         nnoremap <C-j> <C-w>j
+                                         nnoremap <C-k> <C-w>k
+                                         nnoremap <C-l> <C-w>l
+
+                                         " Gör tag-hantering ännu smidigare
+                                         nnoremap <leader>d dat
+                                         nnoremap <leader>y yat
+                                         nnoremap <leader>v vat
+
+                                         nnoremap <leader>l :action MoveEditorToOppositeTabGroup<CR>
+                                         nnoremap <leader>L :execute 'vsplit'<CR>
+                                         nnoremap <leader>O :execute 'only'<CR>%%%
