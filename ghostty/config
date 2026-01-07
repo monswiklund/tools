@@ -12,3 +12,7 @@ command = /opt/homebrew/bin/fish
 window-padding-x = 10
 window-padding-y = 10
 window-decoration = false
+
+# Premium Aesthetics
+background-opacity = 0.9
+background-blur = true
