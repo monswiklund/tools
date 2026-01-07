@@ -1,0 +1,21 @@
+[character]
+# Replace the '❯' with '➜' if you prefer
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[package]
+disabled = true
+
+[git_branch]
+style = "bold purple"
+symbol = "🌱 "
+
+[golang]
+style = "bold cyan"
+symbol = "🐹 "
+
+[custom.flutter]
+command = "flutter --version | head -n 1 | awk '{print $2}'"
+when = "test -f pubspec.yaml"
+symbol = "💙 "
+style = "bold blue"
