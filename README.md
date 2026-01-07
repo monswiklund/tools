@@ -4,7 +4,7 @@ Developer environment configuration for macOS and Linux (Arch/Omarchy).
 
 ## Installation
 
-### 1. Install Packages
+### 1. Install Packages (If needed)
 
 #### macOS (Homebrew)
 
@@ -18,6 +18,7 @@ brew install --cask font-jetbrains-mono-nerd-font
 #### Linux (Arch / Omarchy)
 
 ```bash
+# Most tools are pre-installed in Omarchy. If not:
 sudo pacman -S neovim fish starship zellij ripgrep fd lazygit ghostty
 ```
 
@@ -28,8 +29,11 @@ sudo pacman -S neovim fish starship zellij ripgrep fd lazygit ghostty
 mkdir -p ~/Dev
 git clone https://github.com/monswiklund/tools.git ~/Dev/tools
 
-# Create config directory
+# Backup existing configs to avoid conflicts
 mkdir -p ~/.config
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+mv ~/.config/ghostty ~/.config/ghostty.bak 2>/dev/null
+mv ~/.config/fish ~/.config/fish.bak 2>/dev/null
 
 # Symlink configurations
 ln -s ~/Dev/tools/nvim ~/.config/nvim
