@@ -52,6 +52,16 @@ ln -s ~/Dev/tools/starship.toml ~/.config/starship.toml
 | `<Space> /`  | Grep Search   |
 | `<Space> gg` | LazyGit       |
 | `<Space> e`  | File Explorer |
+| `<Space> u`  | Undotree      |
+
+### Primeagen Power Pack 🔱
+
+| Key              | Action                     |
+| ---------------- | -------------------------- |
+| `<Space> a`      | Harpoon: Add File          |
+| `Ctrl + e`       | Harpoon: Menu              |
+| `Ctrl + h/t/n/s` | Navigate Harpoon 1-4       |
+| `<Space> re`     | Refactor: Extract Function |
 
 ### Terminal
 
