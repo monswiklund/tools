@@ -1,24 +1,27 @@
 # Tools (Omarchy Stack)
 
-Developer environment configuration for macOS.
+Developer environment configuration for macOS and Linux (Arch/Omarchy).
 
 ## Installation
 
-### 1. Install Homebrew
+### 1. Install Packages
+
+#### macOS (Homebrew)
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-### 2. Install Packages
-
-```bash
 brew install --cask ghostty
 brew install neovim fish starship zellij ripgrep fd lazygit
 brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-### 3. Setup Dotfiles
+#### Linux (Arch / Omarchy)
+
+```bash
+sudo pacman -S neovim fish starship zellij ripgrep fd lazygit ghostty
+```
+
+### 2. Setup Dotfiles
 
 ```bash
 # Clone repository
