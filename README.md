@@ -42,28 +42,50 @@ ln -s ~/Dev/tools/fish ~/.config/fish
 ln -s ~/Dev/tools/starship.toml ~/.config/starship.toml
 ```
 
-## Cheat Sheet
+## Command Reference
 
-### NeoVim (Leader = Space)
+### Shell Aliases (Fish)
 
-| Key          | Action        |
-| ------------ | ------------- |
-| `<Space> ff` | Find Files    |
-| `<Space> /`  | Grep Search   |
-| `<Space> gg` | LazyGit       |
-| `<Space> e`  | File Explorer |
-| `<Space> u`  | Undotree      |
+| Command | Alias For | Description              |
+| ------- | --------- | ------------------------ |
+| `v`     | `nvim`    | Open NeoVim              |
+| `g`     | `lazygit` | Open Git UI              |
+| `ll`    | `ls -lG`  | List files (long format) |
+| `ls`    | `ls -G`   | List files (default)     |
 
-### Primeagen Power Pack 🔱
+### Key Navigation (Starship/Fish)
 
-| Key              | Action                     |
-| ---------------- | -------------------------- |
-| `<Space> a`      | Harpoon: Add File          |
-| `Ctrl + e`       | Harpoon: Menu              |
-| `Ctrl + h/t/n/s` | Navigate Harpoon 1-4       |
-| `<Space> re`     | Refactor: Extract Function |
+- **Autosuggestion**: Press `Right Arrow` to complete the gray text.
+- **Path Navigation**: `..` works as expected.
 
-### Terminal
+### NeoVim Shortcuts (Leader = Space)
 
-- **Fish**: Right Arrow to accept autosuggestions.
-- **Zellij**: `zellij` to start. `Ctrl+g` + `n` (new pane), `Ctrl+g` + Arrows (navigate).
+| Key          | Action                    |
+| ------------ | ------------------------- |
+| `<Space> ff` | Find Files (Telescope)    |
+| `<Space> /`  | Grep Search (search text) |
+| `<Space> gg` | LazyGit (inside Vim)      |
+| `<Space> e`  | File Explorer (Neo-tree)  |
+| `<Space> u`  | Undotree (Toggle History) |
+
+### Primeagen Power Pack
+
+| Key          | Action                     |
+| ------------ | -------------------------- |
+| `<Space> a`  | Harpoon: Add current file  |
+| `Ctrl + e`   | Harpoon: Open Menu         |
+| `Ctrl + h`   | Go to File 1               |
+| `Ctrl + t`   | Go to File 2               |
+| `Ctrl + n`   | Go to File 3               |
+| `Ctrl + s`   | Go to File 4               |
+| `<Space> re` | Refactor: Extract Function |
+| `<Space> rv` | Refactor: Extract Variable |
+
+### Zellij (Terminal Multiplexer)
+
+| Shortcut                | Action         |
+| ----------------------- | -------------- |
+| `Ctrl + g` then `n`     | New Pane       |
+| `Ctrl + g` then `x`     | Close Pane     |
+| `Ctrl + g` then `Arrow` | Move Focus     |
+| `Ctrl + g` then `d`     | Detach Session |
