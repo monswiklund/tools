@@ -21,3 +21,8 @@ alias v="nvim"
 # Paths
 fish_add_path $HOME/go/bin
 fish_add_path $HOME/.pub-cache/bin
+
+# Display system info on startup
+if status is-interactive
+    fastfetch
+end
