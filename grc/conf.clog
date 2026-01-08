@@ -67,3 +67,8 @@ count=more
 regexp=SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP BY|ORDER BY|LIMIT
 colours=bold
 count=more
+-
+# Ports (Orange/Bold Yellow) - Matches :8080 or :3000
+regexp=:\d{2,5}
+colours=bold yellow
+count=more
