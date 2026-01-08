@@ -74,3 +74,9 @@ count=more
 regexp=\d{2}:\d{2}:\d{2}(\.\d+)?(\+\d{2}:\d{2})?
 colours=blue
 count=more
+-
+# Explicit Error Key (Bold Red)
+# Matches "Error:" or "error:" explicitly
+regexp=(Error|error):
+colours=bold red
+count=more
