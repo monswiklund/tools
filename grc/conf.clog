@@ -23,7 +23,7 @@ regexp=\d{2}:\d{2}:\d{2}
 colours=blue
 count=more
 -
-# IP Addresses (White on Blue background) - STRICTER
+# IP Addresses (Bold White on Blue) - High Contrast Fix
 regexp=\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b
 colours=bold white on_blue
 count=more
