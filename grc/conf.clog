@@ -27,3 +27,33 @@ count=more
 regexp=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
 colours=bold white on_blue
 count=more
+-
+# UUIDs (Purple)
+regexp=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}
+colours=magenta
+count=more
+-
+# HTTP Methods (Bold Cyan)
+regexp=GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD
+colours=bold cyan
+count=more
+-
+# HTTP Success (Green)
+regexp= 200 | 201 | 204 
+colours=green
+count=more
+-
+# HTTP Client Error (Yellow)
+regexp= 400 | 401 | 403 | 404 
+colours=yellow
+count=more
+-
+# HTTP Server Error (Bold Red)
+regexp= 500 | 502 | 503 | 504 
+colours=bold red
+count=more
+-
+# SQL Keywords (Bold)
+regexp=SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP BY|ORDER BY|LIMIT
+colours=bold
+count=more
