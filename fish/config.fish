@@ -26,3 +26,14 @@ fish_add_path $HOME/.pub-cache/bin
 if status is-interactive
     fastfetch
 end
+
+# GRC (Colorizer)
+if type -q grc
+    source (brew --prefix)/etc/grc.fish
+    
+    # Custom alias for coloring Flutter/Backend logs
+    # Usage: clog flutter run
+    function clog
+        grc -c conf.log --colour=on $argv
+    end
+end
