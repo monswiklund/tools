@@ -37,3 +37,18 @@ if type -q grc
         grc -c conf.log --colour=on $argv
     end
 end
+
+# GRC (Colorizer) - Updated
+if type -q grc
+    source (brew --prefix)/etc/grc.fish
+    
+    # Custom alias for coloring Flutter/Backend logs
+    function clog
+        # Use our custom config if it exists, otherwise fall back
+        if test -f ~/.grc/conf.clog
+            grc -c ~/.grc/conf.clog --colour=on $argv
+        else
+            grc -c conf.log --colour=on $argv
+        end
+    end
+end
