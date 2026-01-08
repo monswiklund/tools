@@ -10,21 +10,21 @@ count=more
 -
 # ERROR = Red
 regexp=ERROR|Error|error|FATAL|Fatal|fatal
-colours=red
+colours=bold red
 count=more
 -
-# Dates (Blue) - Optional handy addition
+# Dates (Blue)
 regexp=\d{4}-\d{2}-\d{2}
 colours=blue
 count=more
 -
-# Time (Blue) - Optional handy addition
+# Time (Blue)
 regexp=\d{2}:\d{2}:\d{2}
 colours=blue
 count=more
 -
-# IP Addresses (White on Blue background)
-regexp=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+# IP Addresses (White on Blue background) - STRICTER
+regexp=\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b
 colours=bold white on_blue
 count=more
 -
@@ -53,17 +53,17 @@ regexp= 500 | 502 | 503 | 504
 colours=bold red
 count=more
 -
-# SQL Keywords (Bold)
-regexp=SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP BY|ORDER BY|LIMIT
-colours=bold
-count=more
--
 # Environment: Development (Orange/Bold Yellow)
 regexp=development|Development|DEV|Dev|dev
 colours=bold yellow
 count=more
 -
-# Environment: Production (Blue)
+# Environment: Production (Bold Blue)
 regexp=production|Production|PROD|Prod|prod
 colours=bold blue
+count=more
+-
+# SQL Keywords (Bold)
+regexp=SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP BY|ORDER BY|LIMIT
+colours=bold
 count=more
