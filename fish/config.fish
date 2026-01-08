@@ -27,59 +27,27 @@ if status is-interactive
     fastfetch
 end
 
-# GRC (Colorizer)
+# GRC (Colorizer) & Custom Wrappers
 if type -q grc
+    # Load default GRC rules (optional, but good for ls, ping etc)
     source (brew --prefix)/etc/grc.fish
     
-    # Custom alias for coloring Flutter/Backend logs
-    # Usage: clog flutter run
+    # Custom logger with our config
     function clog
-        grc -c conf.log --colour=on $argv
-    end
-end
-
-# GRC (Colorizer) - Updated
-if type -q grc
-    source (brew --prefix)/etc/grc.fish
-    
-    # Custom alias for coloring Flutter/Backend logs
-    function clog
-        # Use our custom config if it exists, otherwise fall back
         if test -f ~/.grc/conf.clog
             grc -c ~/.grc/conf.clog --colour=on $argv
         else
-            grc -c conf.log --colour=on $argv
+            grc --colour=on $argv
         end
     end
-end
 
-# Auto-Colorization (Abbreviations)
-# Automatically wraps commands with clog when typed
-
-# Forced Colorization (Functions)
-# Abbreviations require triggers, functions force it.
-function go
-    clog /opt/homebrew/bin/go $argv
-end
-
-function flutter
-    clog /Users/mans/fvm/default/bin/flutter $argv
-end
-
-# Auto-Colorization (Functions)
-# This forces colorization on every run
-function go
-    if type -q grc
-        clog /usr/local/go/bin/go $argv
-    else
-        /usr/local/go/bin/go $argv
+    # Auto-colorize Go
+    function go
+        clog command go $argv
     end
-end
 
-function flutter
-    if type -q grc
-        clog /opt/homebrew/bin/flutter $argv
-    else
-        /opt/homebrew/bin/flutter $argv
+    # Auto-colorize Flutter
+    function flutter
+        clog command flutter $argv
     end
 end
