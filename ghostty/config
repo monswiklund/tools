@@ -17,5 +17,5 @@ macos-titlebar-style = transparent
 window-decoration = true
 
 # Premium Aesthetics
-background-opacity = 0.75
+background-opacity = 0.92
 background-blur = true
