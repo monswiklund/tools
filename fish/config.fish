@@ -55,5 +55,31 @@ end
 
 # Auto-Colorization (Abbreviations)
 # Automatically wraps commands with clog when typed
-abbr --add go 'clog go'
-abbr --add flutter 'clog flutter'
+
+# Forced Colorization (Functions)
+# Abbreviations require triggers, functions force it.
+function go
+    clog /opt/homebrew/bin/go $argv
+end
+
+function flutter
+    clog /Users/mans/fvm/default/bin/flutter $argv
+end
+
+# Auto-Colorization (Functions)
+# This forces colorization on every run
+function go
+    if type -q grc
+        clog /usr/local/go/bin/go $argv
+    else
+        /usr/local/go/bin/go $argv
+    end
+end
+
+function flutter
+    if type -q grc
+        clog /opt/homebrew/bin/flutter $argv
+    else
+        /opt/homebrew/bin/flutter $argv
+    end
+end
