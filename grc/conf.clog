@@ -57,3 +57,13 @@ count=more
 regexp=SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP BY|ORDER BY|LIMIT
 colours=bold
 count=more
+-
+# Environment: Development (Orange/Bold Yellow)
+regexp=development|Development|DEV|Dev|dev
+colours=bold yellow
+count=more
+-
+# Environment: Production (Blue)
+regexp=production|Production|PROD|Prod|prod
+colours=bold blue
+count=more
