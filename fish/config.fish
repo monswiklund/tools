@@ -52,3 +52,8 @@ if type -q grc
         end
     end
 end
+
+# Auto-Colorization (Abbreviations)
+# Automatically wraps commands with clog when typed
+abbr --add go 'clog go'
+abbr --add flutter 'clog flutter'
