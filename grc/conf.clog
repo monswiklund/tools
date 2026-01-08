@@ -43,13 +43,15 @@ regexp= 500 | 502 | 503 | 504
 colours=bold red
 count=more
 -
-# Environment: Development (Orange/Bold Yellow)
-regexp=development|Development|DEV|Dev|dev
+# Environment: Development (Orange/Bold Yellow) - STRICTER
+# Matches "development" or "dev" as WHOLE words only.
+regexp=\b(development|Development|DEV|Dev|dev)\b
 colours=bold yellow
 count=more
 -
-# Environment: Production (Bold Blue)
-regexp=production|Production|PROD|Prod|prod
+# Environment: Production (Bold Blue) - STRICTER
+# Matches "production" or "prod" as WHOLE words only.
+regexp=\b(production|Production|PROD|Prod|prod)\b
 colours=bold blue
 count=more
 -
