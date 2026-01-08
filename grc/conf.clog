@@ -80,3 +80,13 @@ count=more
 regexp=(Error|error):
 colours=bold red
 count=more
+-
+# Explicit Info Key (Green)
+regexp=(Info|INFO|info):
+colours=green
+count=more
+-
+# Explicit Warning Key (Yellow)
+regexp=(Warn|WARN|warn|WARNING|Warning|warning):
+colours=yellow
+count=more
