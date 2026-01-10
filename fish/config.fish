@@ -51,3 +51,7 @@ if type -q grc
         clog command flutter $argv
     end
 end
+
+# LS Colors (Linux Style)
+# Directories=Blue, Executables=Green
+set -x LSCOLORS "ExFxCxDxCxegedabagacad"
