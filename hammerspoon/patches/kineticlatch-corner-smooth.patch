@@ -1,0 +1,161 @@
+--- Spoons/KineticLatch.spoon/init.lua	2026-03-04 08:33:50
++++ Spoons/KineticLatch.spoon/init.lua	2026-03-04 08:40:49
+@@ -41,7 +41,8 @@
+     enabled = true,                     -- Enable the kinetic contraption
+     sensitivity = 1.0,                  -- Kinetic sensitivity multiplier
+     minWindowSize = { w = 100, h = 100 }, -- Minimum window dimensions
+-    throttleMs = 8,                    -- Min ms between setFrame calls (~120fps max, reduces lag)
++    throttleMs = 4,                    -- Smooth mode: higher frame update rate during drag/resize
++    minPixelDelta = 0,                 -- Smooth mode: apply even tiny frame changes
+     debug = false,                      -- Mad scientist debug mode
+     autoStart = true                    -- Auto-engage the contraption on load
+ }
+@@ -57,6 +58,9 @@
+ obj.draggedWindow = nil
+ obj.initialWindowFrame = nil
+ obj.initialMousePos = nil
++obj.resizeAnchorX = "right" -- Which horizontal edge follows the cursor during resize
++obj.resizeAnchorY = "bottom" -- Which vertical edge follows the cursor during resize
++obj.lastAppliedFrame = nil -- Tracks last frame to avoid redundant setFrame calls
+ obj.dragTap = nil
+ obj.lastFrameUpdateTime = 0   -- For throttling setFrame during drag
+ obj.THROTTLE_MS = 8          -- ~120fps max - reduces lag from excessive setFrame calls
+@@ -108,6 +112,7 @@
+     obj.draggedWindow = window
+     obj.initialWindowFrame = window:frame()
+     obj.initialMousePos = mousePos
++    obj.lastAppliedFrame = nil
+     obj.lastFrameUpdateTime = 0  -- Reset throttle on engage
+ 
+     -- Disable animations once at engage (not on every frame)
+@@ -130,8 +135,34 @@
+     obj.draggedWindow = window
+     obj.initialWindowFrame = window:frame()
+     obj.initialMousePos = mousePos
++    obj.lastAppliedFrame = nil
+     obj.lastFrameUpdateTime = 0  -- Reset throttle on engage
+ 
++    -- Choose the nearest corner as resize anchor for true corner-style
++    -- 2D resizing behavior (width + height together).
++    local frame = obj.initialWindowFrame
++    local corners = {
++        { x = frame.x, y = frame.y, anchorX = "left", anchorY = "top", name = "top-left" },
++        { x = frame.x + frame.w, y = frame.y, anchorX = "right", anchorY = "top", name = "top-right" },
++        { x = frame.x, y = frame.y + frame.h, anchorX = "left", anchorY = "bottom", name = "bottom-left" },
++        { x = frame.x + frame.w, y = frame.y + frame.h, anchorX = "right", anchorY = "bottom", name = "bottom-right" }
++    }
++
++    local nearestCorner = corners[1]
++    local nearestDistance = math.huge
++    for _, corner in ipairs(corners) do
++        local dx = mousePos.x - corner.x
++        local dy = mousePos.y - corner.y
++        local distance = (dx * dx) + (dy * dy)
++        if distance < nearestDistance then
++            nearestDistance = distance
++            nearestCorner = corner
++        end
++    end
++
++    obj.resizeAnchorX = nearestCorner.anchorX
++    obj.resizeAnchorY = nearestCorner.anchorY
++
+     -- Disable animations once at engage (not on every frame)
+     hs.window.animationDuration = 0
+ 
+@@ -139,7 +170,8 @@
+     window:focus()
+ 
+     if obj.config.debug then
+-        obj.logger.d('Kinetic resize engaged on window:', window:title())
++        obj.logger.d('Kinetic resize engaged on window:', window:title(),
++            'corner:', nearestCorner.name)
+     end
+     return true
+ end
+@@ -158,14 +190,22 @@
+     local deltaX = (mousePos.x - obj.initialMousePos.x) * obj.config.sensitivity
+     local deltaY = (mousePos.y - obj.initialMousePos.y) * obj.config.sensitivity
+ 
+-    local newFrame = {
+-        x = obj.initialWindowFrame.x + deltaX,
+-        y = obj.initialWindowFrame.y + deltaY,
+-        w = obj.initialWindowFrame.w,
+-        h = obj.initialWindowFrame.h
+-    }
++    local newX = obj.initialWindowFrame.x + deltaX
++    local newY = obj.initialWindowFrame.y + deltaY
++    local newW = obj.initialWindowFrame.w
++    local newH = obj.initialWindowFrame.h
++    local threshold = obj.config.minPixelDelta or 1
++
++    if obj.lastAppliedFrame then
++        if math.abs(newX - obj.lastAppliedFrame.x) < threshold and
++            math.abs(newY - obj.lastAppliedFrame.y) < threshold then
++            return
++        end
++    end
+ 
++    local newFrame = { x = newX, y = newY, w = newW, h = newH }
+     obj.draggedWindow:setFrame(newFrame, 0)
++    obj.lastAppliedFrame = newFrame
+ end
+ 
+ -- Apply kinetic size transformation (throttled for smoothness)
+@@ -182,17 +222,38 @@
+     local deltaX = (mousePos.x - obj.initialMousePos.x) * obj.config.sensitivity
+     local deltaY = (mousePos.y - obj.initialMousePos.y) * obj.config.sensitivity
+ 
+-    local newWidth = math.max(obj.initialWindowFrame.w + deltaX, obj.config.minWindowSize.w)
+-    local newHeight = math.max(obj.initialWindowFrame.h + deltaY, obj.config.minWindowSize.h)
++    local minW = obj.config.minWindowSize.w
++    local minH = obj.config.minWindowSize.h
++    local widthDelta = obj.resizeAnchorX == "right" and deltaX or -deltaX
++    local heightDelta = obj.resizeAnchorY == "bottom" and deltaY or -deltaY
+ 
+-    local newFrame = {
+-        x = obj.initialWindowFrame.x,
+-        y = obj.initialWindowFrame.y,
+-        w = newWidth,
+-        h = newHeight
+-    }
++    local newWidth = math.max(obj.initialWindowFrame.w + widthDelta, minW)
++    local newHeight = math.max(obj.initialWindowFrame.h + heightDelta, minH)
++
++    local newX = obj.initialWindowFrame.x
++    local newY = obj.initialWindowFrame.y
++
++    if obj.resizeAnchorX == "left" then
++        newX = obj.initialWindowFrame.x + (obj.initialWindowFrame.w - newWidth)
++    end
++
++    if obj.resizeAnchorY == "top" then
++        newY = obj.initialWindowFrame.y + (obj.initialWindowFrame.h - newHeight)
++    end
++
++    local threshold = obj.config.minPixelDelta or 1
++    if obj.lastAppliedFrame then
++        if math.abs(newX - obj.lastAppliedFrame.x) < threshold and
++            math.abs(newY - obj.lastAppliedFrame.y) < threshold and
++            math.abs(newWidth - obj.lastAppliedFrame.w) < threshold and
++            math.abs(newHeight - obj.lastAppliedFrame.h) < threshold then
++            return
++        end
++    end
+ 
++    local newFrame = { x = newX, y = newY, w = newWidth, h = newHeight }
+     obj.draggedWindow:setFrame(newFrame, 0)
++    obj.lastAppliedFrame = newFrame
+ end
+ 
+ -- Disengage kinetic manipulation
+@@ -214,6 +275,9 @@
+     obj.draggedWindow = nil
+     obj.initialWindowFrame = nil
+     obj.initialMousePos = nil
++    obj.resizeAnchorX = "right"
++    obj.resizeAnchorY = "bottom"
++    obj.lastAppliedFrame = nil
+ end
+ 
+ -- Main kinetic event processor (handles mouse + modifier events in single tap)

@@ -1,0 +1,13 @@
+--- hotkeys.lua	2026-03-04 08:33:50
++++ hotkeys.lua	2026-03-04 08:43:23
+@@ -181,8 +181,8 @@
+ -- Shift Row
+ hs.hotkey.bind(hammer, "z", "Temporary Function", function() tempFunction() end)
+ hs.hotkey.bind(_hyper, "z", "Temporary Function", function() tempFunction() end)
+-hs.hotkey.bind(hammer, "x", "Toggle Dragon Grid", function() spoon.DragonGrid:toggleGridDisplay() end)
+-hs.hotkey.bind(_hyper, "x", "Dragon Grid Settings", function() spoon.DragonGrid:showSettingsMenu() end)
++hs.hotkey.bind(hammer, "x", "Temporary Function", function() tempFunction() end)
++hs.hotkey.bind(_hyper, "x", "Temporary Function", function() tempFunction() end)
+ hs.hotkey.bind(hammer, "c", "Temporary Function", function() tempFunction() end) -- hs.hotkey.bind(hammer, "c", function() FileManager.showClipboardManager() end) broken
+ hs.hotkey.bind(_hyper, "c", "Temporary Function", function() tempFunction() end) -- hs.hotkey.bind(_hyper, "c", function() FileManager.clearClipboard() end) broken
+ hs.hotkey.bind(hammer, "v", "Temporary Function", function() tempFunction() end)

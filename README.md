@@ -42,6 +42,17 @@ ln -s ~/Dev/tools/fish ~/.config/fish
 ln -s ~/Dev/tools/starship.toml ~/.config/starship.toml
 ```
 
+### Hammerspoon (Optional)
+
+If you want the ready-to-go Hammerspoon setup used in this workspace:
+
+```bash
+cd ~/Dev/tools/hammerspoon
+./setup.sh
+```
+
+See `hammerspoon/README.md` for details.
+
 ## Command Reference
 
 ### Shell Aliases (Fish)
