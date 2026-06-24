@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""Show local Codex usage limits and resets."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sqlite3
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:  # pragma: no cover
+    ZoneInfo = None
+
+
+USAGE_URL = "https://chatgpt.com/backend-api/wham/usage"
+CREDITS_URL = "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits"
+
+
+def local_tz(name: str):
+    if ZoneInfo is None:
+        return timezone.utc
+    try:
+        return ZoneInfo(name)
+    except Exception:
+        return datetime.now().astimezone().tzinfo or timezone.utc
+
+
+def open_db(path: Path) -> sqlite3.Connection:
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+
+
+def dt_from_seconds(seconds: int | float | None, tz) -> str:
+    if not seconds:
+        return "-"
+    return datetime.fromtimestamp(seconds, tz).strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
+def dt_from_iso(value: str | None, tz) -> str:
+    if not value:
+        return "-"
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return parsed.astimezone(tz).strftime("%Y-%m-%d %H:%M:%S %Z")
+
+
+def days_until(value: str | None) -> str:
+    if not value:
+        return "-"
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    delta = parsed - datetime.now(timezone.utc)
+    days = max(0, delta.days)
+    hours = max(0, delta.seconds // 3600)
+    return f"{days}d {hours}h"
+
+
+def auth_headers(codex_home: Path) -> dict:
+    auth = json.loads((codex_home / "auth.json").read_text())
+    tokens = auth["tokens"]
+    headers = {
+        "Authorization": f"Bearer {tokens['access_token']}",
+        "OpenAI-Beta": "codex-1",
+        "originator": "Codex Desktop",
+    }
+    if tokens.get("account_id"):
+        headers["ChatGPT-Account-ID"] = tokens["account_id"]
+    return headers
+
+
+def get_json(url: str, headers: dict) -> dict:
+    request = Request(url, headers=headers)
+    with urlopen(request, timeout=20) as response:
+        return json.loads(response.read().decode())
+
+
+def parse_rate_limit_event(body: str) -> dict | None:
+    for marker in ("websocket event: ", "Received message "):
+        if marker in body:
+            body = body.split(marker, 1)[1]
+            break
+    body = body.strip()
+    if not body.startswith("{"):
+        return None
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError:
+        return None
+
+
+def latest_rate_limits(logs_db: Path) -> dict | None:
+    query = """
+        SELECT ts, feedback_log_body
+        FROM logs
+        WHERE feedback_log_body LIKE '%codex.rate_limits%'
+        ORDER BY ts DESC, ts_nanos DESC, id DESC
+        LIMIT 200
+    """
+    with open_db(logs_db) as conn:
+        for ts, body in conn.execute(query):
+            msg = parse_rate_limit_event(body or "")
+            if msg and msg.get("type") == "codex.rate_limits":
+                msg["_log_ts"] = ts
+                return msg
+    return None
+
+
+def show_limit_block(name: str, data: dict, tz) -> None:
+    primary = data.get("primary") or data.get("primary_window") or {}
+    secondary = data.get("secondary") or data.get("secondary_window") or {}
+    allowed = data.get("allowed")
+    reached = data.get("limit_reached")
+    print(f"{name}: allowed={allowed} reached={reached}")
+    for label, block in (("primary", primary), ("secondary", secondary)):
+        if not block:
+            continue
+        reset_at = block.get("reset_at")
+        reset_after = block.get("reset_after_seconds")
+        reset_in = f"{round(reset_after / 60)} min" if isinstance(reset_after, (int, float)) else "-"
+        used = block.get("used_percent")
+        window = block.get("window_minutes")
+        if window is None and block.get("limit_window_seconds") is not None:
+            window = round(block["limit_window_seconds"] / 60)
+        print(
+            f"  {label}: {used}% used, window={window}m, "
+            f"reset={dt_from_seconds(reset_at, tz)} ({reset_in})"
+        )
+
+
+def show_api_usage(codex_home: Path, tz) -> bool:
+    try:
+        headers = auth_headers(codex_home)
+        usage = get_json(USAGE_URL, headers)
+        credits = get_json(CREDITS_URL, headers)
+    except (FileNotFoundError, KeyError, json.JSONDecodeError, HTTPError, URLError, TimeoutError, OSError) as exc:
+        print(f"API unavailable: {type(exc).__name__}; using local log fallback")
+        return False
+
+    print("Usage limits / resets")
+    print("  source: live API")
+    print(f"  plan: {usage.get('plan_type', '-')}")
+    show_limit_block("default", usage.get("rate_limit") or {}, tz)
+
+    extra = usage.get("additional_rate_limits") or []
+    if extra:
+        print("models:")
+        for item in extra:
+            name = item.get("limit_name", "-")
+            rate = item.get("rate_limit") or {}
+            primary = rate.get("primary_window") or {}
+            secondary = rate.get("secondary_window") or {}
+            print(
+                f"  {name}: "
+                f"p={primary.get('used_percent', '-')}% reset={dt_from_seconds(primary.get('reset_at'), tz)}; "
+                f"s={secondary.get('used_percent', '-')}% reset={dt_from_seconds(secondary.get('reset_at'), tz)}"
+            )
+
+    print("reset credits:")
+    print(
+        f"  available={credits.get('available_count', 0)} "
+        f"referral_earned={credits.get('total_earned_count', '-')}"
+    )
+    for credit in credits.get("credits") or []:
+        print(
+            f"  {credit.get('status', '-')} | "
+            f"granted={dt_from_iso(credit.get('granted_at'), tz)} | "
+            f"expires={dt_from_iso(credit.get('expires_at'), tz)} ({days_until(credit.get('expires_at'))}) | "
+            f"{credit.get('title', '-')}"
+        )
+    return True
+
+
+def show_log_rate_limits(logs_db: Path, tz) -> None:
+    msg = latest_rate_limits(logs_db)
+    print("Usage limits / resets")
+    if not msg:
+        print("  no codex.rate_limits rows found")
+        return
+    print("  source: local log fallback")
+    print(f"  seen: {dt_from_seconds(msg.get('_log_ts'), tz)}")
+    print(f"  plan: {msg.get('plan_type', '-')}")
+    show_limit_block("default", msg.get("rate_limits") or {}, tz)
+
+    extra = msg.get("additional_rate_limits") or {}
+    if extra:
+        print("models:")
+        for model, data in sorted(extra.items()):
+            primary = (data or {}).get("primary") or {}
+            secondary = (data or {}).get("secondary") or {}
+            print(
+                f"  {model}: "
+                f"p={primary.get('used_percent', '-')}% reset={dt_from_seconds(primary.get('reset_at'), tz)}; "
+                f"s={secondary.get('used_percent', '-')}% reset={dt_from_seconds(secondary.get('reset_at'), tz)}"
+            )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--codex-home", default=os.environ.get("CODEX_HOME", "~/.codex"))
+    parser.add_argument("--days", help=argparse.SUPPRESS)
+    parser.add_argument("--limit", help=argparse.SUPPRESS)
+    parser.add_argument("--tz", default=os.environ.get("TZ", "Europe/Stockholm"))
+    args = parser.parse_args()
+
+    codex_home = Path(args.codex_home).expanduser()
+    logs_db = codex_home / "logs_2.sqlite"
+    tz = local_tz(args.tz)
+
+    try:
+        if not show_api_usage(codex_home, tz):
+            show_log_rate_limits(logs_db, tz)
+    except FileNotFoundError as exc:
+        print(f"missing file: {exc}", file=sys.stderr)
+        return 2
+    except sqlite3.Error as exc:
+        print(f"sqlite error: {exc}", file=sys.stderr)
+        return 3
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

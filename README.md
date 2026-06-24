@@ -40,6 +40,7 @@ ln -s ~/Dev/tools/nvim ~/.config/nvim
 ln -s ~/Dev/tools/ghostty ~/.config/ghostty
 ln -s ~/Dev/tools/fish ~/.config/fish
 ln -s ~/Dev/tools/starship.toml ~/.config/starship.toml
+ln -s ~/Dev/tools/scripts/codex-usage ~/.local/bin/codex-usage
 ```
 
 ### Hammerspoon (Optional)
@@ -63,6 +64,12 @@ See `hammerspoon/README.md` for details.
 | `g`     | `lazygit` | Open Git UI              |
 | `ll`    | `ls -lG`  | List files (long format) |
 | `ls`    | `ls -G`   | List files (default)     |
+
+### Local Scripts
+
+| Command       | Description                                      |
+| ------------- | ------------------------------------------------ |
+| `codex-usage` | Show Codex usage limits and banked reset credits |
 
 ### Key Navigation (Starship/Fish)
 
